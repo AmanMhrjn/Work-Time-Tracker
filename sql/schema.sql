@@ -1,0 +1,41 @@
+CREATE DATABASE IF NOT EXISTS worktracker CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE worktracker;
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  default_rate DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  week_start ENUM('mon','sun') NOT NULL DEFAULT 'mon',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE jobs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  job_name VARCHAR(120) NOT NULL,
+  default_rate DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX(user_id)
+);
+
+CREATE TABLE shifts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  job_id INT NULL,
+  shift_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  break_minutes INT NOT NULL DEFAULT 0,
+  hourly_rate DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  notes VARCHAR(500) NULL,
+  computed_minutes INT NOT NULL DEFAULT 0,
+  computed_pay DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE SET NULL,
+  INDEX(user_id),
+  INDEX(shift_date)
+);
